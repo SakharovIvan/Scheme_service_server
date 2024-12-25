@@ -1,0 +1,26 @@
+{
+  "name": "scheme_service_server",
+  "version": "1.0.0",
+  "description": "Service for INTERSKOL tools schemes",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon bin/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sequelize/postgres": "^7.0.0-alpha.43",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
+    "file-system": "^2.2.2",
+    "nodemon": "^3.1.9",
+    "path": "^0.12.7",
+    "pdf-to-img": "^4.3.0",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.5"
+  }
+}
