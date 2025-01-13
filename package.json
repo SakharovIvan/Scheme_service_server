@@ -22,5 +22,9 @@
     "pdf-to-img": "^4.3.0",
     "pg": "^8.13.1",
     "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "jest": "^29.7.0"
   }
 }
