@@ -9,13 +9,11 @@ try {
 
   const pdf_paths_from_DB = await ToolPaths.findAll({ raw: true });
   const promises = pdf_paths_from_DB.map(async ({ tool_code, tool_path }) => {
-    return await pdfScheme_service.createIMGfromPDF(
-      pdfPath + tool_path,
-      tool_code
-    );
+    await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code);
+    await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
+    return;
   });
   Promise.all(promises).then(() => console.log("PNG files created"));
 } catch (err) {
   console.log(err);
 }
- 

@@ -13,12 +13,12 @@ class SchemeService {
   }
   async getPDFSchemePath(tool_code) {
     const data = await ToolPaths.findOne({ where: { tool_code }, raw: true });
-    console.log(data);
+    console.log(data)
     return data.tool_path;
   }
   async getSPmatNoByToolCode(tool_code) {
     return await ToolSPmatNo.findAll({ where: { tool_code } });
-  }
+  } 
 }
 
 export default new SchemeService();
