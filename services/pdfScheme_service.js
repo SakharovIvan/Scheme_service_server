@@ -12,9 +12,14 @@ class SchemeService {
     await pdftojpgConvertor(path_to_pdf, tool_code);
   }
   async getPDFSchemePath(tool_code) {
-    const data = await ToolPaths.findOne({ where: { tool_code }, raw: true });
-    console.log(data)
-    return data.tool_path;
+    try {
+      const data = await ToolPaths.findOne({ where: { tool_code }, raw: true });
+      console.log(data)
+      return data.tool_path;
+    } catch (error) {
+      return error
+    }
+
   }
   async getSPmatNoByToolCode(tool_code) {
     return await ToolSPmatNo.findAll({ where: { tool_code } });

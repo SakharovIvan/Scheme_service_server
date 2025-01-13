@@ -21,14 +21,8 @@ toolSceme.post("/tool/upload/pdf/:id", (req, res) => {
       console.log(err);
       return res.status(500).send({ msg: "Error occured" });
     }
-    await SchemeService.createPNGfromPDF(
-      `${pdfPath}/${myFile.name}`,
-      toolcode
-    );
-    await SchemeService.createJPGfromPDF(
-      `${pdfPath}/${myFile.name}`,
-      toolcode
-    );
+    await SchemeService.createPNGfromPDF(`${pdfPath}/${myFile.name}`, toolcode);
+    await SchemeService.createJPGfromPDF(`${pdfPath}/${myFile.name}`, toolcode);
 
     return res.send({ name: myFile.name, result: "Создано" });
   });
@@ -39,6 +33,13 @@ toolSceme.get("/tool/pdf/:id", (req, res) => {
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
     return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
+  });
+});
+toolSceme.get("/tool/download/pdf/:id", (req, res) => {
+  const toolcode = req.params.id;
+  console.log(toolcode);
+  SchemeService.getPDFSchemePath(toolcode).then((path) => {
+    return res.download(`${__dirname}/Scheme_service_server${path}`);
   });
 });
 
