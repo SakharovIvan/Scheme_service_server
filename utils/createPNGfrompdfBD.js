@@ -22,7 +22,7 @@ try {
     );
   }
 
-  await createMasPictures(50, 0);
+  await createMasPictures(10, 0);
 } catch (err) {
   console.log(err);
 }
