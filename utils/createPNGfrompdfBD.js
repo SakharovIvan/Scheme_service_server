@@ -17,15 +17,12 @@ try {
       await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
       return;
     });
-    Promise.all(promises)
-      .then(() => console.log(`${limit} ${offset} pictures created`))
-
+    Promise.all(promises).then(() =>
+      console.log(`${limit} ${offset} pictures created`)
+    );
   }
-  let interval_param=10
-  await createMasPictures();
-  setInterval(()=>{createMasPictures(interval_param+10,interval_param)
-    interval_param+=10
-  },5000)
+
+  await createMasPictures(50, 0);
 } catch (err) {
   console.log(err);
 }
