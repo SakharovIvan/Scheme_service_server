@@ -6,14 +6,14 @@ try {
   const __filename = process.cwd();
   const __dirname = path.dirname(__filename);
   const pdfPath = `${__dirname}/Scheme_service_server`;
-  async function createMasPictures(limit = 70, offset = 65) {
+  async function createMasPictures(limit = 70, offset = 60) {
     const pdf_paths_from_DB = await ToolPaths.findAll({
       raw: true,
       limit,
       offset,
     });
-    const promises = pdf_paths_from_DB.map(({ tool_code, tool_path }) => {
-      setTimeout(async() => await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code), 3000)
+    const promises = pdf_paths_from_DB.map(async ({ tool_code, tool_path }) => {
+      await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code);
       //await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
       return;
     });
