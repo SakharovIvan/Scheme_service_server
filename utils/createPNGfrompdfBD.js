@@ -6,7 +6,7 @@ try {
   const __filename = process.cwd();
   const __dirname = path.dirname(__filename);
   const pdfPath = `${__dirname}/Scheme_service_server`;
-  async function createMasPictures(limit = 25, offset = 10) {
+  async function createMasPictures(limit = 25, offset = 20) {
     const pdf_paths_from_DB = await ToolPaths.findAll({
       raw: true,
       limit,
