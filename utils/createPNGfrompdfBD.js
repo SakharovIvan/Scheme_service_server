@@ -12,19 +12,21 @@ try {
       limit,
       offset,
     });
-    const promises = pdf_paths_from_DB.map(async ({ tool_code, tool_path }) => {
-      await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code);
+    const promises = pdf_paths_from_DB.map(
+      async ({ tool_code, tool_path }) =>
+        await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
       //await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
-      return;
-    });
-    Promise.all(promises)
-      .then(() => console.log(`${limit} ${offset} pictures created`))
-      .then(() =>
-        setTimeout(() => createMasPictures(limit + 2, offset + 2), 5000)
-      );
+    );
+    return Promise.all(promises).then(() =>
+      console.log(`${limit} ${offset} pictures created`)
+    );
   }
-
-  createMasPictures();
+  let opt = 70;
+  setInterval(() => {
+    createMasPictures(opt, opt - 5).then(() => {
+      opt += 5;
+    });
+  }, 5000);
 } catch (err) {
   console.log(err);
 }
