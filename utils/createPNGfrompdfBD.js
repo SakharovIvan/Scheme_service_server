@@ -19,10 +19,11 @@ try {
     });
     Promise.all(promises).then(() =>
       console.log(`${limit} ${offset} pictures created`)
-    );
+    )
+    .then(()=>createMasPictures(limit+10,offset+10))
   }
-let param = 20
-  await createMasPictures(param+10, param);
+
+  createMasPictures();
 } catch (err) {
   console.log(err);
 }
