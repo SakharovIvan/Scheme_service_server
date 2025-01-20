@@ -19,12 +19,13 @@ try {
     });
     Promise.all(promises)
       .then(() => console.log(`${limit} ${offset} pictures created`))
-      .then(
-        () => setTimeout(() => createMasPictures(limit + 5, offset + 5)),
-        5000
-      );
+
   }
+  let interval_param=10
   await createMasPictures();
+  setInterval(()=>{createMasPictures(interval_param+10,interval_param)
+    interval_param+=10
+  },5000)
 } catch (err) {
   console.log(err);
 }
