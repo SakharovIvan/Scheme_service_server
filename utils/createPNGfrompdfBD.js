@@ -14,7 +14,7 @@ try {
     });
     const promises = pdf_paths_from_DB.map(async ({ tool_code, tool_path }) => {
       await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code);
-      await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
+      //await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
       return;
     });
     Promise.all(promises)
