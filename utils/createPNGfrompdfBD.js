@@ -21,8 +21,8 @@ try {
       console.log(`${limit} ${offset} pictures created`)
     );
   }
-
-  await createMasPictures(20, 10);
+let param = 20
+  await createMasPictures(param+10, param);
 } catch (err) {
   console.log(err);
 }
