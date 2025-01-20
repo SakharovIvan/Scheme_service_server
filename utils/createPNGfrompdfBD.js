@@ -21,7 +21,7 @@ try {
       console.log(`${limit} ${offset} pictures created`)
     );
   }
-  let opt = 70;
+  let opt = 75;
   setInterval(
     () =>
       createMasPictures(opt, opt - 5).then(() => {
