@@ -6,7 +6,7 @@ try {
   const __filename = process.cwd();
   const __dirname = path.dirname(__filename);
   const pdfPath = `${__dirname}/Scheme_service_server`;
-  async function createMasPictures(limit = 35, offset = 30) {
+  async function createMasPictures(limit = 5, offset = 0) {
     const pdf_paths_from_DB = await ToolPaths.findAll({
       raw: true,
       limit,
@@ -17,10 +17,11 @@ try {
       await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
       return;
     });
-    Promise.all(promises).then(() =>
-      console.log(`${limit} ${offset} pictures created`)
-    )
-    .then(()=>createMasPictures(limit+10,offset+10))
+    Promise.all(promises)
+      .then(() => console.log(`${limit} ${offset} pictures created`))
+      .then(() =>
+        setTimeout(() => createMasPictures(limit + 5, offset + 5), 15000)
+      );
   }
 
   createMasPictures();
