@@ -20,7 +20,7 @@ try {
     Promise.all(promises)
       .then(() => console.log(`${limit} ${offset} pictures created`))
       .then(() =>
-        setTimeout(() => createMasPictures(limit + 5, offset + 5), 15000)
+        setTimeout(() => createMasPictures(limit + 5, offset + 5), 30000)
       );
   }
 
