@@ -2,8 +2,7 @@ import { ToolPaths } from "../src/DB/models.js";
 import pdfScheme_service from "../services/pdfScheme_service.js";
 import path from "path";
 
-try {
-  const __filename = process.cwd();
+const __filename = process.cwd();
   const __dirname = path.dirname(__filename);
   const pdfPath = `${__dirname}/Scheme_service_server`;
   async function createMasPictures(limit = 70, offset = 68) {
@@ -21,6 +20,8 @@ try {
       console.log(`${limit} ${offset} pictures created`)
     );
   }
+try {
+  
   let opt = 75;
   setInterval(
     () =>
