@@ -22,11 +22,13 @@ try {
     );
   }
   let opt = 70;
-  setInterval(() => {
-    createMasPictures(opt, opt - 5).then(() => {
-      opt += 5;
-    });
-  }, 5000);
+  setInterval(
+    () =>
+      createMasPictures(opt, opt - 5).then(() => {
+        opt += 5;
+      }),
+    5000
+  );
 } catch (err) {
   console.log(err);
 }
