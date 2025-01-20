@@ -12,15 +12,15 @@ try {
       limit,
       offset,
     });
-    const promises = pdf_paths_from_DB.map(async ({ tool_code, tool_path }) => {
-      await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code);
+    const promises = pdf_paths_from_DB.map(({ tool_code, tool_path }) => {
+      setTimeout(async() => await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code), 3000)
       //await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
       return;
     });
     Promise.all(promises)
       .then(() => console.log(`${limit} ${offset} pictures created`))
       .then(() =>
-        setTimeout(() => createMasPictures(limit + 5, offset + 5), 30000)
+        setTimeout(() => createMasPictures(limit + 5, offset + 5), 5000)
       );
   }
 
