@@ -13,8 +13,8 @@ async function createMasPictures(limit = 70, offset = 68) {
   });
   const promises = pdf_paths_from_DB.map(
     async ({ tool_code, tool_path }) =>
-     await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
-    //await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code);
+    // await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
+    await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code)
   );
   return Promise.all(promises).then(() =>
     console.log(`${limit} ${offset} pictures created`)
