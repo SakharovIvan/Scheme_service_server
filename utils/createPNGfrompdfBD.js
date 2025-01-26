@@ -21,7 +21,7 @@ async function createMasPictures(limit = 70, offset = 68) {
   );
 }
 try {
-  await createMasPictures(100, 70);
+  await createMasPictures(90, 70);
 } catch (err) {
   console.log(err);
 }
