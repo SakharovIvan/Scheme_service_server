@@ -14,9 +14,9 @@ const corsOptions = {
 const PORT = process.env.PORT || 3003;
 
 app.use(cors(corsOptions));
-app.use("/", toolSceme);
+app.use("/toolservice", toolSceme);
 
-app.get("/", (req, res) => {
+app.get("/toolservice", (req, res) => {
   res.json({ message: "Welcome to Intreskol scheme service" });
 });
 
