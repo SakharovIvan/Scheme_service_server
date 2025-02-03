@@ -33,7 +33,7 @@ try {
     setInterval(async()=> {await createMasPictures(1,i-1) 
       i++
       console.log(i)
-    } ,5000)
+    } ,10000)
 
 
 } catch (err) {
