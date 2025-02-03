@@ -14,9 +14,9 @@ async function createMasPictures(limit = 1, offset = 68) {
 console.log(pdf_paths_from_DB)
   const { tool_code, tool_path }=pdf_paths_from_DB[0]
   console.log(tool_code, tool_path)
-  await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
-    await pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code)
-    console.log(`${limit} ${offset} pictures created`)
+   pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
+   .then(()=>pdfScheme_service.createPNGfromPDF(pdfPath + tool_path, tool_code))
+     .then(()=>console.log(`${limit} ${offset} pictures created`))
   //const promises = pdf_paths_from_DB.map(
   //  async ({ tool_code, tool_path }) =>{
   //  await pdfScheme_service.createJPGfromPDF(pdfPath + tool_path, tool_code)
