@@ -6,8 +6,7 @@ import toolSceme from "../routes/scheme.js";
 const app = express();
 dotenv.config();
 const corsOptions = {
-  origin: process.env.APP_URL,
-  methods:['GET','POST'],
+//  origin: process.env.APP_URL,
   credentials: true, 
   optionSuccessStatus: 200,
 };
