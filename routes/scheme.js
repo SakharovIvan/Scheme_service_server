@@ -2,6 +2,7 @@ import { Router } from "express";
 import fileUpload from "express-fileupload";
 import { pdfPath, pngPath, jpgPath, __dirname } from "../folders.js";
 import SchemeService from "../services/pdfScheme_service.js";
+import { pdf } from "pdf-to-img";
 
 const toolSceme = new Router();
 toolSceme.use(fileUpload());
@@ -41,14 +42,14 @@ toolSceme.get("/tool/pdf/:id", (req, res) => {
   const toolcode = req.params.id;
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.sendFile(`${__dirname}${path}`);
+    return res.sendFile(`${pdfPath}${path}`);
   });
 });
 toolSceme.get("/tool/download/pdf/:id.pdf", (req, res) => {
   const toolcode = req.params.id;
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.download(`${__dirname}${path}`);
+    return res.download(`${pdfPath}${path}`);
   });
 });
 
