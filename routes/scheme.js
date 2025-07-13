@@ -28,7 +28,7 @@ toolSceme.post("/tool/upload/pdf/:id", (req, res) => {
   });
 });
 
-toolSceme.get("tools", (req, res) => {
+toolSceme.get("/tools", (req, res) => {
   try {
     const options = req.query;
     SchemeService.getToolList(options).then((data) => res.json(data));
@@ -41,14 +41,14 @@ toolSceme.get("/tool/pdf/:id", (req, res) => {
   const toolcode = req.params.id;
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.sendFile(`${__dirname}${path}`);
+    return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
   });
 });
 toolSceme.get("/tool/download/pdf/:id.pdf", (req, res) => {
   const toolcode = req.params.id;
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.download(`${__dirname}${path}`);
+    return res.download(`${__dirname}/Scheme_service_server${path}`);
   });
 });
 
