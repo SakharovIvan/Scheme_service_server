@@ -7,7 +7,7 @@ const app = express();
 dotenv.config();
 const corsOptions = {
   origin: process.env.APP_URL,
-  //credentials: true, //access-control-allow-credentials:true
+  credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
 
