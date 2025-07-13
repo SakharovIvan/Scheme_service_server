@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node bin/index.js",
     "dev": "nodemon bin/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@sequelize/postgres": "^7.0.0-alpha.43",
+    "canvas": "^3.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -26,5 +28,8 @@
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
     "jest": "^29.7.0"
+  },
+  "bin": {
+    "scheme_service_server": "bin/index.js"
   }
 }

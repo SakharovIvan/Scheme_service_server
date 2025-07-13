@@ -32,7 +32,7 @@ toolSceme.get("/tool/pdf/:id", (req, res) => {
   const toolcode = req.params.id;
   console.log(toolcode);
   SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
+    return res.sendFile(`${__dirname}${path}`);
   });
 });
 toolSceme.get("/tool/download/pdf/:id.pdf", (req, res) => {
