@@ -10,6 +10,7 @@ const corsOptions = {
   credentials: true, 
   optionSuccessStatus: 200,
 methods: 'GET,POST',
+allowedHeaders: 'Content-Type,Authorization'
 };
 
 const PORT = process.env.PORT || 3003;
