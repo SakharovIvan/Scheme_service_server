@@ -21,6 +21,15 @@ class SchemeService {
     }
 
   }
+  async getToolList(options){
+    try {
+  const data = await ToolPaths.findAll({...options,  raw: true });
+
+      return data
+    } catch (error) {
+      return error
+    }
+  }
   async getSPmatNoByToolCode(tool_code) {
     return await ToolSPmatNo.findAll({ where: { tool_code } });
   } 
