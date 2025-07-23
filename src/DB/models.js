@@ -49,6 +49,15 @@ ToolSPmatNo.init(
     spqty: {
       type: DataTypes.INTEGER,
     },
+    top:{
+      type:DataTypes.STRING
+    },
+        left:{
+      type:DataTypes.STRING
+    },
+        diametr:{
+      type:DataTypes.STRING
+    }
   },
   {
     sequelize,
