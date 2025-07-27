@@ -7,14 +7,14 @@ import bodyParser from "body-parser";
 const toolSceme = new Router();
 toolSceme.use(fileUpload());
 
-toolSceme.post("/tool/upload/pdf/:id", (req, res) => {
+toolSceme.post("/tool/upload/pdf/:id/:name", (req, res) => {
   const toolcode = req.params.id;
+  const filename = req.params.name
   if (!req.files) {
     return res.status(404).send({ msg: "File is not found" });
   }
 
   const myFile = req.files.pdf;
-  const filename = myFile.name;
 
   myFile.mv(`${pdfPath}/${filename}`, async function (err) {
     if (err) {

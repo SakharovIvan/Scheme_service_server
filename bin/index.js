@@ -11,7 +11,7 @@ const corsOptions = {
   credentials: true, 
   optionSuccessStatus: 200,
 methods: 'GET, POST',
-allowedHeaders: 'Content-Type,Authorization'
+allowedHeaders: 'Content-Type,Authorization,Content-Encoding'
 };
 
 const PORT = process.env.PORT || 3003;
