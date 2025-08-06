@@ -11,17 +11,16 @@ class SchemeService {
   async createJPGfromPDF(path_to_pdf, tool_code) {
     await pdftojpgConvertor(path_to_pdf, tool_code);
   }
-  async updateTool(data){
-        try {
-        const current = await ToolPaths.findOne({
-          where: { tool_code: data.tool_code.toString() },
-        });
-        if (!current) {
-          return await ToolPaths.create(data);
-        }
-        return await current.update(data);
-      
-        } catch (error) {
+  async updateTool(data) {
+    try {
+      const current = await ToolPaths.findOne({
+        where: { tool_code: data.tool_code.toString() },
+      });
+      if (!current) {
+        return await ToolPaths.create(data);
+      }
+      return await current.update(data);
+    } catch (error) {
       return error;
     }
   }
@@ -35,6 +34,15 @@ class SchemeService {
   }
   async spmatNoListUpd(data) {
     try {
+      const toolList = data.reduce((accumulator, currentValue) => {
+        if (accumulator.includes(!currentValue.tool_code.toString())) {
+          accumulator.push(currentValue);
+        }
+      }, []);
+      const tool_promise = toolList.map(async (el) => {
+        await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
+      });
+      Promise.all(tool_promise);
       const promises = data.map(async (e) => {
         const current = await ToolSPmatNo.findOne({
           where: { spmatNo: e.spmatNo, tool_code: e.tool_code.toString() },
@@ -57,12 +65,20 @@ class SchemeService {
       return error;
     }
   }
-  async getSPmatNoByToolCode({options,tool_code}) {
-    return await ToolSPmatNo.findAll({ where: { tool_code } ,raw: true,...options});
+  async getSPmatNoByToolCode({ options, tool_code }) {
+    return await ToolSPmatNo.findAll({
+      where: { tool_code },
+      raw: true,
+      ...options,
+    });
   }
 
-    async getToolCodesBySPmatNo({options,spmatNo}) {
-    return await ToolSPmatNo.findAll({ where: { spmatNo },raw: true,...options });
+  async getToolCodesBySPmatNo({ options, spmatNo }) {
+    return await ToolSPmatNo.findAll({
+      where: { spmatNo },
+      raw: true,
+      ...options,
+    });
   }
 }
 
