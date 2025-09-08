@@ -38,8 +38,9 @@ toolSceme.post("/tool/update",bodyParser.json(),  (req, res) => {
 toolSceme.get("/tools",  (req, res) => {
   try {
     const options = req.query;
-    SchemeService.getToolList(options).then((data) => res.json(data));
+    return SchemeService.getToolList(options).then((data) => res.json(data));
   } catch (error) {
+    console.log(error)
     return error;
   }
 });

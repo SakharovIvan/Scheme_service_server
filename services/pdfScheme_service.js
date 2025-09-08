@@ -38,6 +38,7 @@ class SchemeService {
         if (accumulator.includes(!currentValue.tool_code.toString())) {
           accumulator.push(currentValue);
         }
+        return accumulator
       }, []);
       const tool_promise = toolList.map(async (el) => {
         await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
@@ -54,23 +55,31 @@ class SchemeService {
       });
       Promise.all(promises);
     } catch (error) {
+      console.log(error)
       return error;
     }
   }
   async getToolList(options) {
     try {
-      const data = await ToolPaths.findAll({ ...options, raw: true });
+      const data = await ToolPaths.findAll({ ...options, raw: true, order:[['tool_code','ASC']] });
       return data;
     } catch (error) {
+      console.log(error)
       return error;
     }
   }
   async getSPmatNoByToolCode({ options, tool_code }) {
-    return await ToolSPmatNo.findAll({
+    try {
+          return await ToolSPmatNo.findAll({
       where: { tool_code },
-      raw: true,
+      raw: true
+      , order:[['sppiccode','ASC']],
       ...options,
     });
+    } catch (error) {
+      return error
+    }
+
   }
 
   async getToolCodesBySPmatNo({ options, spmatNo }) {
