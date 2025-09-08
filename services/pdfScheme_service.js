@@ -34,19 +34,22 @@ class SchemeService {
   }
   async spmatNoListUpd(data) {
     try {
+            console.log(data)
+
       const toolList = data.reduce((accumulator, currentValue) => {
-        if (accumulator.includes(!currentValue.tool_code.toString())) {
-          accumulator.push(currentValue);
+        if (!accumulator.includes(currentValue.tool_code.toString())) {
+          accumulator= [...accumulator,currentValue.tool_code.toString()]
         }
-        return accumulator
+        return accumulator;
       }, []);
+      console.log(toolList)
       const tool_promise = toolList.map(async (el) => {
         await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
       });
       Promise.all(tool_promise);
       const promises = data.map(async (e) => {
         const current = await ToolSPmatNo.findOne({
-          where: { spmatNo: e.spmatNo, tool_code: e.tool_code.toString() },
+          where: { sppiccode: e.sppiccode.toString(), tool_code: e.tool_code.toString() },
         });
         if (!current) {
           return await ToolSPmatNo.create(e);
@@ -55,31 +58,34 @@ class SchemeService {
       });
       Promise.all(promises);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return error;
     }
   }
   async getToolList(options) {
     try {
-      const data = await ToolPaths.findAll({ ...options, raw: true, order:[['tool_code','ASC']] });
+      const data = await ToolPaths.findAll({
+        ...options,
+        raw: true,
+        order: [["tool_code", "ASC"]],
+      });
       return data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return error;
     }
   }
   async getSPmatNoByToolCode({ options, tool_code }) {
     try {
-          return await ToolSPmatNo.findAll({
-      where: { tool_code },
-      raw: true
-      , order:[['sppiccode','ASC']],
-      ...options,
-    });
+      return await ToolSPmatNo.findAll({
+        where: { tool_code },
+        raw: true,
+        order: [["sppiccode", "ASC"]],
+        ...options,
+      });
     } catch (error) {
-      return error
+      return error;
     }
-
   }
 
   async getToolCodesBySPmatNo({ options, spmatNo }) {
