@@ -34,29 +34,54 @@ class SchemeService {
   }
   async spmatNoListUpd(data) {
     try {
-            console.log(data)
+      const checker = data.filter((el) => "id" in el);
 
-      const toolList = data.reduce((accumulator, currentValue) => {
-        if (!accumulator.includes(currentValue.tool_code.toString())) {
-          accumulator= [...accumulator,currentValue.tool_code.toString()]
-        }
-        return accumulator;
-      }, []);
-      console.log(toolList)
-      const tool_promise = toolList.map(async (el) => {
-        await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
-      });
-      Promise.all(tool_promise);
-      const promises = data.map(async (e) => {
-        const current = await ToolSPmatNo.findOne({
-          where: { sppiccode: e.sppiccode.toString(), tool_code: e.tool_code.toString() },
+      if (checker.length === 0) {
+        const toolList = data.reduce((accumulator, currentValue) => {
+          if (!accumulator.includes(currentValue.tool_code.toString())) {
+            accumulator = [...accumulator, currentValue.tool_code.toString()];
+          }
+          return accumulator;
+        }, []);
+        const tool_promise = toolList.map(async (el) => {
+          await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
         });
-        if (!current) {
-          return await ToolSPmatNo.create(e);
-        }
-        return await current.update(e);
-      });
-      Promise.all(promises);
+        await Promise.all(tool_promise);
+        const uniqueArray = data.filter((value, index) => {
+          const _value = JSON.stringify(value);
+          return (
+            index ===
+            data.findIndex((obj) => {
+              return JSON.stringify(obj) === _value;
+            })
+          );
+        });
+        const promises = uniqueArray.map(async (e) => {
+          const current = await ToolSPmatNo.findOne({
+            where: {
+              sppiccode: e.sppiccode.toString(),
+              tool_code: e.tool_code.toString(),
+            },
+          });
+          if (!current) {
+            return await ToolSPmatNo.create({
+              ...e,
+              sppiccode: e.sppiccode.toString(),
+            });
+          }
+          return await current.update(e);
+        });
+        await Promise.all(promises);
+      } else {
+        const promises = data.map(async (el) => {
+          const current = await ToolSPmatNo.findOne({ where: { id: el.id } });
+          if (!current) {
+            return;
+          }
+          return await current.update({ ...current, ...el });
+        });
+        await Promise.all(promises);
+      }
     } catch (error) {
       console.log(error);
       return error;
