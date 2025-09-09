@@ -1,6 +1,7 @@
 import {
   pdftojpgConvertor,
   pdftopngConvertor,
+  deletePics,
 } from "../utils/converter_pdf_to_img.js";
 import { ToolPaths, ToolSPmatNo } from "../src/DB/models.js";
 
@@ -116,15 +117,24 @@ class SchemeService {
   async getToolCodesBySPmatNo({ options, spmatNo }) {
     return await ToolSPmatNo.findAll({
       where: { spmatNo },
-      raw: true,
       ...options,
     });
   }
 
   async deleteAllInfo(tool_code) {
     try {
-      await ToolSPmatNo.destroy({ where: { tool_code: tool_code.toString() } });
-      await ToolPaths.destroy({ where: { tool_code: tool_code.toString() } });
+      const currentTool = await ToolPaths.findOne({
+        where: { tool_code: tool_code.toString() },
+        raw: true,
+      });
+      if (currentTool) {
+        console.log(currentTool);
+        await ToolSPmatNo.destroy({
+          where: { tool_code: tool_code.toString() },
+        });
+        await ToolPaths.destroy({ where: { tool_code: tool_code.toString() } });
+        await deletePics(currentTool.tool_path, tool_code);
+      }
     } catch (error) {
       console.log(error);
     }

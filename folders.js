@@ -7,4 +7,4 @@ const tempPath = `${__dirname}/Scheme_service_server/public/temp/`;
 const pngPath = `${__dirname}/Scheme_service_server/public/png/`;
 const jpgPath = `${__dirname}/Scheme_service_server/public/jpg/`;
 const pdfPath = `${__dirname}/Scheme_service_server/public/toolPDF/`;
-export { tempPath, pngPath, jpgPath, __dirname, pdfPath };
+export { tempPath, pngPath, jpgPath, __dirname, pdfPath,__filename };
