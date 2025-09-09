@@ -8,10 +8,10 @@ const app = express();
 dotenv.config();
 const corsOptions = {
   origin: process.env.APP_URL,
-  credentials: true, 
+  credentials: true,
   optionSuccessStatus: 200,
-methods: 'GET, POST',
-allowedHeaders: 'Content-Type,Authorization,Content-Encoding'
+  methods: "GET, POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization,Content-Encoding",
 };
 
 const PORT = process.env.PORT || 3003;
@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  }),
+  })
 );
 
 app.get("/toolservice", (req, res) => {

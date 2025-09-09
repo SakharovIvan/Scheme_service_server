@@ -120,6 +120,15 @@ class SchemeService {
       ...options,
     });
   }
+
+  async deleteAllInfo(tool_code) {
+    try {
+      await ToolSPmatNo.destroy({ where: { tool_code: tool_code.toString() } });
+      await ToolPaths.destroy({ where: { tool_code: tool_code.toString() } });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 export default new SchemeService();
