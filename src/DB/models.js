@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
-import { sequelize } from "../../config.js";
+import { sequelize } from "../../config/sequilize.js";
 
 class ToolPaths extends Model {}
 class ToolSPmatNo extends Model {}

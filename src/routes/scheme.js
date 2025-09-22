@@ -1,6 +1,6 @@
 import { Router } from "express";
 import fileUpload from "express-fileupload";
-import { pdfPath, pngPath, jpgPath, __dirname, tempPath } from "../folders.js";
+import { pdfPath, pngPath, jpgPath, __dirname, tempPath } from "../../folders.js";
 import SchemeService from "../services/pdfScheme_service.js";
 import bodyParser from "body-parser";
 

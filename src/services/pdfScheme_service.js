@@ -2,8 +2,8 @@ import {
   pdftojpgConvertor,
   pdftopngConvertor,
   deletePics,
-} from "../utils/converter_pdf_to_img.js";
-import { ToolPaths, ToolSPmatNo } from "../src/DB/models.js";
+} from "../../utils/converter_pdf_to_img.js";
+import { ToolPaths, ToolSPmatNo } from "../DB/models.js";
 
 class SchemeService {
   async createPNGfromPDF(path_to_pdf, tool_code) {
