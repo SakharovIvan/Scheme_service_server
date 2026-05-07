@@ -33,10 +33,10 @@ toolSceme.post("/tool/upload/pdf/:id/:name", (req, res) => {
   });
 });
 
- toolSceme.delete("/tool", async (req, res) => {
+toolSceme.delete("/tool", async (req, res) => {
   try {
     const { tool_code } = req.query;
-    console.log(tool_code)
+    console.log(tool_code);
     await SchemeService.deleteAllInfo(tool_code);
   } catch (error) {
     console.log(error);
@@ -46,6 +46,22 @@ toolSceme.post("/tool/upload/pdf/:id/:name", (req, res) => {
 toolSceme.post("/tool/update", bodyParser.json(), (req, res) => {
   const { body } = req;
   SchemeService.spmatNoListUpd(body.data).then((data) => res.json(data));
+});
+
+toolSceme.post("/tool/:id/:num", bodyParser.json(), async (req, res) => {
+  try {
+    
+      const { id } = req.params;
+      const { num } = req.params;
+      const tool = await SchemeService.updateTool({ tool_code: id,picture_number: num });
+      await SchemeService.createPNGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code,Number(num));
+      await SchemeService.createJPGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code,Number(num));
+
+
+   return res.json({status:200})
+  } catch (error) {
+    return error;
+  }
 });
 
 toolSceme.get("/tools", (req, res) => {
@@ -86,13 +102,16 @@ toolSceme.get("/tool/download/pdf/:id.pdf", (req, res) => {
   });
 });
 
-toolSceme.get("/tool/png/:id", (req, res) => {
+toolSceme.get("/tool/png/:id/:num", (req, res) => {
   const toolcode = req.params.id;
-  return res.sendFile(`${pngPath}${toolcode}.png`);
+  const { num } = req.params;
+  return res.sendFile(`${pngPath}${num}_${toolcode}.png`);
 });
-toolSceme.get("/tool/jpg/:id", (req, res) => {
+toolSceme.get("/tool/jpg/:id/:num", (req, res) => {
   const toolcode = req.params.id;
-  return res.sendFile(`${jpgPath}${toolcode}.jpg`);
+  const { num } = req.params;
+
+  return res.sendFile(`${jpgPath}${num}_${toolcode}.jpg`);
 });
 toolSceme.get("/tool/:id", (req, res) => {
   const tool_code = req.params.id;

@@ -7,11 +7,10 @@ import bodyParser from "body-parser";
 const app = express();
 dotenv.config();
 const corsOptions = {
-  origin: process.env.APP_URL,
+  origin: [process.env.APP_URL],
   credentials: true,
   optionSuccessStatus: 200,
-  methods: "GET, POST,DELETE",
-  allowedHeaders: "Content-Type,Authorization,Content-Encoding",
+  allowedHeaders: "Content-Type, Authorization, Content-Encoding",
 };
 
 const PORT = process.env.PORT || 3003;

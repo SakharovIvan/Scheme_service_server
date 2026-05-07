@@ -22,6 +22,12 @@ ToolPaths.init(
       type: DataTypes.STRING,
       unique: true,
     },
+    picture_number:{
+      type:DataTypes.NUMBER,
+      unique:false,
+      allowNull:true,
+      defaultValue:1
+    }
   },
   {
     sequelize,

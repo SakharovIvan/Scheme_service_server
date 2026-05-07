@@ -6,11 +6,13 @@ import {
 import { ToolPaths, ToolSPmatNo } from "../src/DB/models.js";
 
 class SchemeService {
-  async createPNGfromPDF(path_to_pdf, tool_code) {
-    await pdftopngConvertor(path_to_pdf, tool_code);
+  async createPNGfromPDF(path_to_pdf, tool_code,num) {
+    await pdftopngConvertor(path_to_pdf, tool_code,num);
+    return
   }
-  async createJPGfromPDF(path_to_pdf, tool_code) {
-    await pdftojpgConvertor(path_to_pdf, tool_code);
+  async createJPGfromPDF(path_to_pdf, tool_code,num) {
+    await pdftojpgConvertor(path_to_pdf, tool_code,num);
+    return
   }
   async updateTool(data) {
     try {
@@ -91,7 +93,7 @@ class SchemeService {
   async getToolList(options) {
     try {
       const data = await ToolPaths.findAll({
-        ...options,
+        where:{...options},
         raw: true,
         order: [["tool_code", "ASC"]],
       });
