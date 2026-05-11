@@ -1,6 +1,6 @@
 /node_modules
 .env
-config.js
+./config.js
 /public/jpg/
 /public/png/
 /public/toolPDF/
