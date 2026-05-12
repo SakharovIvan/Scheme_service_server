@@ -7,7 +7,13 @@ import bodyParser from "body-parser";
 const app = express();
 dotenv.config();
 const corsOptions = {
-  origin: [process.env.APP_URL,'browser://extensions/','chrome://extensions','opera://extensions/'],
+  origin: (origin, callback) => {
+        if (!origin || origin === process.env.APP_URL || origin.startsWith('chrome-extension://')) {
+          callback(null, true); // разрешаем запросы с localhost:3006 и из расширений Chrome
+        } else {
+          callback(null, false); // запрещаем остальные запросы
+        }
+      },
   credentials: true,
   optionSuccessStatus: 200,
   allowedHeaders: "Content-Type, Authorization, Content-Encoding",
