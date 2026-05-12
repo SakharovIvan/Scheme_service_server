@@ -1,8 +1,8 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import { sequelize } from "../../config.js";
 
-class ToolPaths extends Model {}
-class ToolSPmatNo extends Model {}
+class ToolPaths extends Model { }
+class ToolSPmatNo extends Model { }
 
 ToolPaths.init(
   {
@@ -22,11 +22,17 @@ ToolPaths.init(
       type: DataTypes.STRING,
       unique: true,
     },
-    picture_number:{
-      type:DataTypes.NUMBER,
-      unique:false,
-      allowNull:true,
-      defaultValue:1
+    document_length: {
+      type: DataTypes.NUMBER,
+      unique: false,
+      allowNull: false,
+      defaultValue: 1
+    },
+    picture_number: {
+      type: DataTypes.NUMBER,
+      unique: false,
+      allowNull: true,
+      defaultValue: 1
     }
   },
   {
@@ -55,14 +61,14 @@ ToolSPmatNo.init(
     spqty: {
       type: DataTypes.INTEGER,
     },
-    top:{
-      type:DataTypes.STRING
+    top: {
+      type: DataTypes.STRING
     },
-        left:{
-      type:DataTypes.STRING
+    left: {
+      type: DataTypes.STRING
     },
-        diametr:{
-      type:DataTypes.STRING
+    diametr: {
+      type: DataTypes.STRING
     }
   },
   {

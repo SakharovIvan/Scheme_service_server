@@ -21,10 +21,13 @@ toolSceme.post("/tool/upload/pdf/:id/:name", (req, res) => {
       console.log(err);
       return res.status(500).send({ msg: "Error occured" });
     }
+    const doc_length = await SchemeService.get_pdf_length(`${pdfPath}/${filename}`)
+
     await SchemeService.updateTool({
       tool_code: toolcode,
       tool_path: "/public/toolPDF/" + filename,
       tool_name: filename,
+      document_length: doc_length
     });
     await SchemeService.createPNGfromPDF(`${pdfPath}/${filename}`, toolcode);
     await SchemeService.createJPGfromPDF(`${pdfPath}/${filename}`, toolcode);
@@ -50,15 +53,15 @@ toolSceme.post("/tool/update", bodyParser.json(), (req, res) => {
 
 toolSceme.post("/tool/:id/:num", bodyParser.json(), async (req, res) => {
   try {
-    
-      const { id } = req.params;
-      const { num } = req.params;
-      const tool = await SchemeService.updateTool({ tool_code: id,picture_number: num });
-      await SchemeService.createPNGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code,Number(num));
-      await SchemeService.createJPGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code,Number(num));
+
+    const { id } = req.params;
+    const { num } = req.params;
+    const tool = await SchemeService.updateTool({ tool_code: id, picture_number: num });
+    await SchemeService.createPNGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code, Number(num));
+    await SchemeService.createJPGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code, Number(num));
 
 
-   return res.json({status:200})
+    return res.json({ status: 200 })
   } catch (error) {
     return error;
   }
