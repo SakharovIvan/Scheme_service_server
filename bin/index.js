@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const app = express();
 dotenv.config();
 const corsOptions = {
-  origin: [process.env.APP_URL],
+  origin: [process.env.APP_URL,'browser://extensions/','chrome://extensions','opera://extensions/'],
   credentials: true,
   optionSuccessStatus: 200,
   allowedHeaders: "Content-Type, Authorization, Content-Encoding",
