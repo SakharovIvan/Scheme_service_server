@@ -3,7 +3,7 @@ import {
   pdftopngConvertor,
   deletePics,
 } from "../utils/converter_pdf_to_img.js";
-import { ToolPaths, ToolSPmatNo } from "../src/DB/models.js";
+import { ToolPaths, ToolSPmatNo } from "../models.js";
 import { pdf } from "pdf-to-img";
 
 class SchemeService {
@@ -73,7 +73,7 @@ class SchemeService {
             })
           );
         });
-        const promises = uniqueArray.map(async (e) => {
+        const promises = uniqueArray.map(async (e, index) => {
           const current = await ToolSPmatNo.findOne({
             where: {
               sppiccode: e.sppiccode.toString(),
@@ -83,6 +83,7 @@ class SchemeService {
           if (!current) {
             return await ToolSPmatNo.create({
               ...e,
+              sppicode_num: index + 1,
               sppiccode: e.sppiccode.toString(),
             });
           }

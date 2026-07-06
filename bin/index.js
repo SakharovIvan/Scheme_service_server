@@ -1,26 +1,26 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import toolSceme from "../routes/scheme.js";
 import bodyParser from "body-parser";
+import toolSceme from "../src/routes.js";
 
 const app = express();
 dotenv.config();
 const corsOptions = {
-  origin: (origin, callback) => {
-        if (!origin || origin === process.env.APP_URL || origin.startsWith('chrome-extension://')) {
-          callback(null, true); // разрешаем запросы с localhost:3006 и из расширений Chrome
-        } else {
-          callback(null, false); // запрещаем остальные запросы
-        }
-      },
+  origin:
+    (origin, callback) => {
+      if (!origin || origin === process.env.APP_URL || origin.startsWith('chrome-extension://')) {
+        callback(null, true); // разрешаем запросы с localhost:3006 и из расширений Chrome
+      } else {
+        callback(null, false); // запрещаем остальные запросы
+      }
+    },
   credentials: true,
   optionSuccessStatus: 200,
   allowedHeaders: "Content-Type, Authorization, Content-Encoding",
 };
 
 const PORT = process.env.PORT || 3003;
-
 app.use(cors(corsOptions));
 app.use("/toolservice", toolSceme);
 app.use(bodyParser.json());

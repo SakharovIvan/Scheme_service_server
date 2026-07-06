@@ -1,6 +1,6 @@
 import { pdf } from "pdf-to-img";
 import fs from "file-system";
-import { pngPath, jpgPath, __filename } from "../folders.js";
+import { pngPath, jpgPath, __filename } from "../../folders.js";
 
 function arraed_num(list_number) {
   const res = []

@@ -1,4 +1,4 @@
-import { ToolPaths } from "../src/DB/models.js";
+import { ToolPaths } from "../DB/models.js";
 import pdfScheme_service from "../services/pdfScheme_service.js";
 import path from "path";
 

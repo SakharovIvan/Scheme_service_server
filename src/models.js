@@ -1,5 +1,6 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
-import { sequelize } from "../../config.js";
+import { sequelize } from "../config.js";
+import dotenv from "dotenv";
 
 class ToolPaths extends Model { }
 class ToolSPmatNo extends Model { }
@@ -23,13 +24,13 @@ ToolPaths.init(
       unique: true,
     },
     document_length: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
       defaultValue: 1
     },
     picture_number: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       unique: false,
       allowNull: true,
       defaultValue: 1
@@ -48,6 +49,10 @@ ToolSPmatNo.init(
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
+    },
+    sppicode_num: {
+      type: DataTypes.INTEGER,
+
     },
     tool_code: {
       type: DataTypes.STRING,
