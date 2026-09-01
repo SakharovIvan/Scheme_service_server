@@ -78,6 +78,29 @@ async function pdftojpgConvertor(path_to_pdf, tool_code, num = 1) {
   return
 }
 
+async function pdfBuffer_tojpgConvertor(path_to_pdf, tool_code, num = 1) {
+  const document = await pdf(path_to_pdf, { scale: 3 });
+  if (!document) {
+    console.log('no document' + path_to_pdf)
+    return
+  }
+  const current_files = await getFilesWithPartialName(jpgPath, tool_code + '.jpg')
+  const promises = current_files.map(async (file) => {
+    await delete_pic(jpgPath + file)
+    return
+  })
+  await Promise.all(promises)
+
+  const array = arraed_num(num)
+  const bulk_create_promise = array.map(async (el_bulk) => {
+    const page12buffer = await document.getPage(document.length - num + el_bulk);
+    await fs.promises.writeFile(`${jpgPath}${el_bulk}_${tool_code}.jpg`, page12buffer);
+    return
+  })
+  await Promise.all(bulk_create_promise)
+  return
+}
+
 function deletePics(path_to_pdf, tool_code) {
   try {
     console.log(__filename + path_to_pdf);
@@ -98,4 +121,4 @@ function deletePics(path_to_pdf, tool_code) {
   }
 
 }
-export { pdftojpgConvertor, pdftopngConvertor, deletePics };
+export { pdftojpgConvertor, pdftopngConvertor, deletePics, pdfBuffer_tojpgConvertor };

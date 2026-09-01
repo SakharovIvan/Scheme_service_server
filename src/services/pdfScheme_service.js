@@ -3,10 +3,37 @@ import {
   pdftopngConvertor,
   deletePics,
 } from "../utils/converter_pdf_to_img.js";
-import { ToolPaths, ToolSPmatNo } from "../models.js";
+import { Tool_Files, ToolPaths, ToolSPmatNo, New_ToolSPmatNo } from "../models.js";
 import { pdf } from "pdf-to-img";
 
 class SchemeService {
+  async get_current_Tool_Files(scheme_data) {
+    try {
+      return Tool_Files.findAll({ where: { ...scheme_data, current_version: true }, raw: true })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async get_current_ToolSPmatNo(scheme_data) {
+    try {
+      if (!scheme_data.version) {
+        const current = await this.get_current_scheme(scheme_data)
+      }
+      return New_ToolSPmatNo.findAll({ where: { ...scheme_data, version: current.version }, raw: true })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async create_tool_version(tool_code) {
+    try {
+      Tool_Files.findAll({ where: { tool_code }, raw: true })
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
   async get_pdf_length(path_to_pdf) {
     try {
       return await pdf(path_to_pdf).then((data) => {
@@ -20,6 +47,8 @@ class SchemeService {
       return 0;
     }
   }
+
+
   async createPNGfromPDF(path_to_pdf, tool_code, num) {
     await pdftopngConvertor(path_to_pdf, tool_code, num);
     return

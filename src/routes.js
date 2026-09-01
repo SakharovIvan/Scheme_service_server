@@ -1,39 +1,53 @@
 import { Router } from "express";
-import fileUpload from "express-fileupload";
 import { pdfPath, pngPath, jpgPath, __dirname, tempPath } from "../folders.js";
 import SchemeService from "./services/pdfScheme_service.js";
 import bodyParser from "body-parser";
+import { S3_service } from "./services/s3.js";
+import multer from 'multer';
+import { pdfBuffer_tojpgConvertor } from "./utils/converter_pdf_to_img.js";
 
 const toolSceme = new Router();
-toolSceme.use(fileUpload());
 
-toolSceme.post("/tool/upload/pdf/:id/:name", (req, res) => {
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 } // Ограничение размера файла (10 МБ)
+});
+
+
+toolSceme.post("/tool/upload/pdf/:id/:name", upload.any(), async (req, res) => {
   const toolcode = req.params.id;
   const filename = req.params.name;
-  if (!req.files) {
+  const version = parseInt(req.param.version) || 1;
+  if (!req.files[0]) {
     return res.status(404).send({ msg: "File is not found" });
   }
+  //получить toolcode в бд
 
-  const myFile = req.files.pdf;
+  let existed_tool_version = await SchemeService.create_tool_version();
 
-  myFile.mv(`${pdfPath}/${filename}`, async function (err) {
-    if (err) {
-      console.log(err);
-      return res.status(500).send({ msg: "Error occured" });
-    }
-    const doc_length = await SchemeService.get_pdf_length(`${pdfPath}/${filename}`)
+  const file = req.files[0]
+  await S3_service.upload(file, filename, `${toolcode}/${version}/`);
+  await pdfBuffer_tojpgConvertor(file.buffer, toolcode, 2)
 
-    await SchemeService.updateTool({
-      tool_code: toolcode,
-      tool_path: "/public/toolPDF/" + filename,
-      tool_name: filename,
-      document_length: doc_length
-    });
-    await SchemeService.createPNGfromPDF(`${pdfPath}/${filename}`, toolcode);
-    await SchemeService.createJPGfromPDF(`${pdfPath}/${filename}`, toolcode);
 
-    return res.send({ name: filename, result: "Создано", code: 200, toolcode });
-  });
+  //const myFile = req.files.pdf;
+  //
+  //myFile.mv(`${pdfPath}/${filename}`, async function (err) {
+  //  if (err) {
+  //    console.log(err);
+  //    return res.status(500).send({ msg: "Error occured" });
+  //  }
+  //  const doc_length = await SchemeService.get_pdf_length(`${pdfPath}/${filename}`)
+  //
+  //  await SchemeService.updateTool({
+  //    tool_code: toolcode,
+  //    tool_path: "/public/toolPDF/" + filename,
+  //    tool_name: filename,
+  //    document_length: doc_length
+  //  });
+  //  return res.send({ name: filename, result: "Создано", code: 200, toolcode });
+  //});
+
 });
 
 toolSceme.delete("/tool", async (req, res) => {
@@ -90,19 +104,27 @@ toolSceme.get("/spareparts/:id", (req, res) => {
   }
 });
 
-toolSceme.get("/tool/pdf/:id", (req, res) => {
+toolSceme.get("/tool/pdf/:id", async (req, res) => {
   const toolcode = req.params.id;
-  console.log(toolcode);
-  SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
-  });
+
+  const url = await S3_service.getFileUrl(`/${toolcode}`)
+  return res.redirect(url);
+  //console.log(toolcode);
+  //SchemeService.getPDFSchemePath(toolcode).then((path) => {
+  //  return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
+  //});
 });
-toolSceme.get("/tool/download/pdf/:id.pdf", (req, res) => {
+toolSceme.get("/tool/download/pdf/:id.pdf", async (req, res) => {
   const toolcode = req.params.id;
-  console.log(toolcode);
-  SchemeService.getPDFSchemePath(toolcode).then((path) => {
-    return res.download(`${__dirname}/Scheme_service_server${path}`);
-  });
+
+  const url = await S3_service.getFileUrl(`/${toolcode}`)
+  return res.redirect(url);
+
+  // const toolcode = req.params.id;
+  // console.log(toolcode);
+  // SchemeService.getPDFSchemePath(toolcode).then((path) => {
+  //   return res.download(`${__dirname}/Scheme_service_server${path}`);
+  // });
 });
 
 toolSceme.get("/tool/png/:id/:num", (req, res) => {

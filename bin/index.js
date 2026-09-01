@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import bodyParser from "body-parser";
 import toolSceme from "../src/routes.js";
 
 const app = express();
@@ -23,12 +22,12 @@ const corsOptions = {
 const PORT = process.env.PORT || 3003;
 app.use(cors(corsOptions));
 app.use("/toolservice", toolSceme);
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+//app.use(bodyParser.json());
+//app.use(
+//  bodyParser.urlencoded({
+//    extended: false,
+//  })
+//);
 
 app.get("/toolservice", (req, res) => {
   res.json({ message: "Welcome to Intreskol scheme service" });
