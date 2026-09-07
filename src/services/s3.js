@@ -32,14 +32,19 @@ class S3 {
 
     }
     async getDownloadUrl(name, folder) {
-        const command = new GetObjectCommand({
-            Bucket: this.bucket,
-            Key: folder + name,
-        });
+        try {
+            const command = new GetObjectCommand({
+                Bucket: this.bucket,
+                Key: folder + name,
+            });
 
-        return await getSignedUrl(this.s3, command, {
-            expiresIn: 3600, // 1 час
-        });
+            return await getSignedUrl(this.s3, command, {
+                expiresIn: 3600, // 1 час
+            });
+        } catch (err) {
+            console.log(err)
+        }
+
     }
     async delete(name, folder) {
         try {

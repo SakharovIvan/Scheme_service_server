@@ -125,7 +125,7 @@ toolSceme.get("/tool/png/:tool_code/:version/:num", async (req, res) => {
     return
   }
   const current_tool = current_tool_list[0]
-  const url = await S3_service.getDownloadUrl(`${current_tool.document_length - current_tool.picture_number + Number(num) - 1}.png`, `/${current_tool.tool_code}/${current_tool.version}/jpg/`)
+  const url = await S3_service.getDownloadUrl(`${current_tool.document_length - current_tool.picture_number + Number(num) - 1}.png`, `/${current_tool.tool_code}/${current_tool.version}/png/`)
 
   return res.redirect(url);
 });
