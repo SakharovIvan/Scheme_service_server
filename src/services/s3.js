@@ -20,7 +20,7 @@ class S3 {
         try {
             const command = new PutObjectCommand({
                 Bucket: this.bucket,
-                Key: folder + name,
+                Key: '/tool/' + folder + name,
                 Body: file.buffer,
                 ContentType: file.mimetype,
             });
@@ -35,7 +35,7 @@ class S3 {
         try {
             const command = new GetObjectCommand({
                 Bucket: this.bucket,
-                Key: folder + name,
+                Key: '/tool/' + folder + name,
             });
 
             return await getSignedUrl(this.s3, command, {
@@ -50,7 +50,7 @@ class S3 {
         try {
             const command = new DeleteObjectCommand({
                 Bucket: this.bucket,
-                Key: folder + name,
+                Key: '/tool/' + folder + name,
             });
             const response = await s3.send(command);
             console.log("Объект удалён:", response);
