@@ -11,7 +11,7 @@ class SchemeService {
 
   async get_tools(data) {
     try {
-      const tools_list = await Tools.findAll({ where: data, raw: true })
+      const tools_list = await Tools.findAll({ where: data, raw: true, order: [["tool_code", "ASC"]], })
       return tools_list
     } catch (er) { console.log(er) }
   }
