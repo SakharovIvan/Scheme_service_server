@@ -1,6 +1,8 @@
 import { pdf } from "pdf-to-img";
 import fs from "file-system";
 import { pngPath, jpgPath, __filename } from "../../folders.js";
+import { S3_service } from "../services/s3.js";
+import pdfScheme_service from "../services/pdfScheme_service.js";
 
 function arraed_num(list_number) {
   const res = []
@@ -9,6 +11,30 @@ function arraed_num(list_number) {
   }
 
   return res
+
+}
+
+async function pdf_to_pictures_save_S3(file, document_length, tool_code, version) {
+  try {
+    const document = await pdf(file, { scale: 3 });
+    //const current_files = await getFilesWithPartialName(pngPath, tool_code + '.png')
+    const array = arraed_num(document_length)
+    console.log('pdf_to_pictures_save_S3')
+    const promises = array.map(async (index) => {
+      try {
+        console.log(index)
+        const page12buffer = await document.getPage(index);
+        await S3_service.upload(page12buffer, index + '.png', `${tool_code}/${version}/png/`)
+        await pdfScheme_service.add_picture(tool_code, version, 'png', index)
+        await S3_service.upload(page12buffer, index + '.jpg', `${tool_code}/${version}/jpg/`)
+        await pdfScheme_service.add_picture(tool_code, version, 'jpg', index)
+
+      } catch (e) {
+        console.log(e)
+      }
+    })
+    return Promise.all(promises).catch((e) => console.log(e))
+  } catch (e) { console.log(e) }
 
 }
 
@@ -26,8 +52,6 @@ async function pdftopngConvertor(path_to_pdf, tool_code, num = 1) {
   await Promise.all(promises)
   const array = arraed_num(num)
   const bulk_create_promise = array.map(async (el_bulk) => {
-    console.log(document.length - num + el_bulk - 1)
-
     const page12buffer = await document.getPage(document.length - num + el_bulk);
     await fs.promises.writeFile(`${pngPath}${el_bulk}_${tool_code}.png`, page12buffer);
     return
@@ -121,4 +145,4 @@ function deletePics(path_to_pdf, tool_code) {
   }
 
 }
-export { pdftojpgConvertor, pdftopngConvertor, deletePics, pdfBuffer_tojpgConvertor };
+export { pdftojpgConvertor, pdftopngConvertor, deletePics, pdfBuffer_tojpgConvertor, pdf_to_pictures_save_S3 };

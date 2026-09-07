@@ -9,7 +9,6 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { s3_client } from '../../config.js';
-import { fs } from 'file-system';
 
 class S3 {
 

@@ -2,38 +2,58 @@ import {
   pdftojpgConvertor,
   pdftopngConvertor,
   deletePics,
+  pdf_to_pictures_save_S3,
 } from "../utils/converter_pdf_to_img.js";
-import { Tool_Files, ToolPaths, ToolSPmatNo, New_ToolSPmatNo } from "../models.js";
+import { Tool_Files, ToolPaths, ToolSPmatNo, New_ToolSPmatNo, Tools } from "../models.js";
 import { pdf } from "pdf-to-img";
 
 class SchemeService {
-  async get_current_Tool_Files(scheme_data) {
+
+  async get_tools(data) {
     try {
-      return Tool_Files.findAll({ where: { ...scheme_data, current_version: true }, raw: true })
+      const tools_list = await Tools.findAll({ where: data, raw: true })
+      return tools_list
+    } catch (er) { console.log(er) }
+  }
+  async get_current(tool_code) {
+    try {
+      const tools = await this.get_tools({ tool_code })
+      const res = tools.filter((el) => el.version === tools.length)[0]
+      return res
+    } catch (err) {
+      console.log(err)
+    }
+
+  }
+  async add_new_tool(data) {
+    try {
+      await Tools.create(data)
+      await this.set_new_version(data.tool_code, data.version)
+
+      return this.get_tools(data)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  async add_picture(tool_code, version, type, list_num = 1) {
+    try {
+      Tool_Files.create({ tool_code, version, list_num, type })
     } catch (e) {
       console.log(e)
     }
   }
 
-  async get_current_ToolSPmatNo(scheme_data) {
+  async create_pictures(file, document_length, tool_code, version) {
+    console.log('create_pictures')
     try {
-      if (!scheme_data.version) {
-        const current = await this.get_current_scheme(scheme_data)
-      }
-      return New_ToolSPmatNo.findAll({ where: { ...scheme_data, version: current.version }, raw: true })
+      console.log("create_pictures start")
+      await pdf_to_pictures_save_S3(file, document_length, tool_code, version)
+      return
     } catch (e) {
       console.log(e)
     }
   }
 
-  async create_tool_version(tool_code) {
-    try {
-      Tool_Files.findAll({ where: { tool_code }, raw: true })
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
   async get_pdf_length(path_to_pdf) {
     try {
       return await pdf(path_to_pdf).then((data) => {
@@ -48,6 +68,40 @@ class SchemeService {
     }
   }
 
+  async set_new_version(tool_code, version) {
+    const current_list = await this.getToolList({ tool_code })
+    const promises = current_list.map(async (el) => {
+      if (el.version === version) {
+        await Tools.update({ current_version: true }, { where: { id: el.id } })
+        return
+      }
+      await Tools.update({ current_version: false }, { where: { id: el.id } })
+      return
+    })
+    Promise.all(promises)
+  }
+  async create_tool(data) {
+    try {
+      const current = await Tools.findAll({ where: data, raw: true })
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async getToolList(options) {
+    try {
+      const data = await Tools.findAll({
+        where: { ...options },
+        raw: true,
+        order: [["tool_code", "ASC"]],
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 
   async createPNGfromPDF(path_to_pdf, tool_code, num) {
     await pdftopngConvertor(path_to_pdf, tool_code, num);
@@ -59,14 +113,16 @@ class SchemeService {
   }
   async updateTool(data) {
     try {
-      const current = await ToolPaths.findOne({
-        where: { tool_code: data.tool_code.toString() },
+      const current = await Tools.findOne({
+        where: { tool_code: data.tool_code, version: data.version },
       });
       if (!current) {
-        return await ToolPaths.create(data);
+        return await Tools.create(data);
       }
-      return await current.update(data);
+      await current.update(data);
+      return current.save(current)
     } catch (error) {
+      console.log(error)
       return error;
     }
   }
@@ -90,7 +146,7 @@ class SchemeService {
           return accumulator;
         }, []);
         const tool_promise = toolList.map(async (el) => {
-          await ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
+          await New_ToolSPmatNo.destroy({ where: { tool_code: el.toString() } });
         });
         await Promise.all(tool_promise);
         const uniqueArray = data.filter((value, index) => {
@@ -103,14 +159,14 @@ class SchemeService {
           );
         });
         const promises = uniqueArray.map(async (e, index) => {
-          const current = await ToolSPmatNo.findOne({
+          const current = await New_ToolSPmatNo.findOne({
             where: {
               sppiccode: e.sppiccode.toString(),
               tool_code: e.tool_code.toString(),
             },
           });
           if (!current) {
-            return await ToolSPmatNo.create({
+            return await New_ToolSPmatNo.create({
               ...e,
               sppicode_num: index + 1,
               sppiccode: e.sppiccode.toString(),
@@ -121,7 +177,7 @@ class SchemeService {
         await Promise.all(promises);
       } else {
         const promises = data.map(async (el) => {
-          const current = await ToolSPmatNo.findOne({ where: { id: el.id } });
+          const current = await New_ToolSPmatNo.findOne({ where: { id: el.id } });
           if (!current) {
             return;
           }
@@ -134,26 +190,14 @@ class SchemeService {
       return error;
     }
   }
-  async getToolList(options) {
+
+  async getSPmatNoByToolCode({ options, version, tool_code }) {
     try {
-      const data = await ToolPaths.findAll({
-        where: { ...options },
-        raw: true,
-        order: [["tool_code", "ASC"]],
-      });
-      return data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
-  async getSPmatNoByToolCode({ options, tool_code }) {
-    try {
-      return await ToolSPmatNo.findAll({
-        where: { tool_code },
+      return await New_ToolSPmatNo.findAll({
+        where: { tool_code, version, ...options },
         raw: true,
         order: [["sppiccode", "ASC"]],
-        ...options,
+
       });
     } catch (error) {
       return error;
@@ -167,19 +211,18 @@ class SchemeService {
     });
   }
 
-  async deleteAllInfo(tool_code) {
+  async deleteAllInfo(tool_code, version) {
     try {
-      const currentTool = await ToolPaths.findOne({
-        where: { tool_code: tool_code.toString() },
+      const currentTool = await Tools.findOne({
+        where: { tool_code: tool_code.toString(), version },
         raw: true,
       });
       if (currentTool) {
         console.log(currentTool);
-        await ToolSPmatNo.destroy({
-          where: { tool_code: tool_code.toString() },
+        await Tools.destroy({
+          where: { tool_code: tool_code.toString(), version },
         });
-        await ToolPaths.destroy({ where: { tool_code: tool_code.toString() } });
-        await deletePics(currentTool.tool_path, tool_code);
+        await New_ToolSPmatNo.destroy({ where: { tool_code: tool_code.toString(), version } });
       }
     } catch (error) {
       console.log(error);

@@ -95,11 +95,17 @@ Tools.init(
     },
     tool_code: {
       type: DataTypes.STRING,
-      unique: true,
+    },
+    version: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
+    },
+    current_version: {
+      defaultValue: false,
+      type: DataTypes.BOOLEAN
     },
     tool_name: {
       type: DataTypes.STRING,
-      unique: true,
     },
     document_length: {
       type: DataTypes.INTEGER,
@@ -182,10 +188,6 @@ Tool_Files.init(
     version: {
       type: DataTypes.INTEGER,
     },
-    current_version: {
-      defaultValue: false,
-      type: DataTypes.BOOLEAN
-    },
     type: {
       type: DataTypes.STRING,
     },
@@ -202,4 +204,6 @@ Tool_Files.init(
 
 
 
-export { ToolPaths, ToolSPmatNo, Tool_Files, New_ToolSPmatNo };
+
+
+export { ToolPaths, ToolSPmatNo, Tool_Files, New_ToolSPmatNo, Tools };

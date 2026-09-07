@@ -12,7 +12,7 @@ const sequelize = new Sequelize({
   password: process.env.DATABASE_PASSWORD + '',
   host: process.env.DATABASE_HOST,
   port: process.env.DATABASE_PORT,
-  logging: true,
+  logging: false,
   //ssl: true,
   //clientMinMessages: 'notice',
 });
@@ -24,7 +24,7 @@ const sequelize_new = new Sequelize({
   password: process.env.DATABASE_PASSWORD + '',
   host: process.env.DATABASE_HOST,
   port: process.env.DATABASE_PORT,
-  logging: true,
+  logging: false,
   //ssl: true,
   //clientMinMessages: 'notice',
 });
@@ -34,8 +34,8 @@ const s3_client = new S3Client({
   endpoint: "https://s3.gis-1.storage.selcloud.ru",
   port: 443,
   credentials: {
-    accessKeyId: "546c7d3194554b39bb5d7eb29956733a",
-    secretAccessKey: "3dd4531d2284414cbc17984d5a96c9bb"
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_KEY,
   }
 });
 

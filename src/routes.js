@@ -4,7 +4,7 @@ import SchemeService from "./services/pdfScheme_service.js";
 import bodyParser from "body-parser";
 import { S3_service } from "./services/s3.js";
 import multer from 'multer';
-import { pdfBuffer_tojpgConvertor } from "./utils/converter_pdf_to_img.js";
+import { pdf_to_pictures_save_S3, pdfBuffer_tojpgConvertor } from "./utils/converter_pdf_to_img.js";
 
 const toolSceme = new Router();
 
@@ -15,46 +15,39 @@ const upload = multer({
 
 
 toolSceme.post("/tool/upload/pdf/:id/:name", upload.any(), async (req, res) => {
-  const toolcode = req.params.id;
-  const filename = req.params.name;
-  const version = parseInt(req.param.version) || 1;
-  if (!req.files[0]) {
-    return res.status(404).send({ msg: "File is not found" });
+  try {
+    const tool_code = req.params.id;
+    const filename = req.params.name;
+    if (!req.files[0]) {
+      return res.status(404).send({ msg: "File is not found" });
+    }
+    const file = req.files[0]
+    const current_list = await SchemeService.get_tools({ tool_code })
+    const document_length = await SchemeService.get_pdf_length(file.buffer)
+    let tool
+    let version
+    if (current_list.length === 0) {
+      tool = await SchemeService.add_new_tool({ tool_code, document_length, tool_name: filename, version: 1 })
+      version = 1
+    } else {
+      version = current_list.length + 1
+      tool = await SchemeService.add_new_tool({ tool_code, document_length, tool_name: filename, version: version })
+    }
+    await S3_service.upload(file, filename, `${tool_code}/${version}/`);
+    await pdf_to_pictures_save_S3(file.buffer, document_length, tool_code, version)
+
+
+    return res.json({ status: "200" })
+  } catch (e) {
+    console.log(e)
   }
-  //получить toolcode в бд
-
-  let existed_tool_version = await SchemeService.create_tool_version();
-
-  const file = req.files[0]
-  await S3_service.upload(file, filename, `${toolcode}/${version}/`);
-  await pdfBuffer_tojpgConvertor(file.buffer, toolcode, 2)
-
-
-  //const myFile = req.files.pdf;
-  //
-  //myFile.mv(`${pdfPath}/${filename}`, async function (err) {
-  //  if (err) {
-  //    console.log(err);
-  //    return res.status(500).send({ msg: "Error occured" });
-  //  }
-  //  const doc_length = await SchemeService.get_pdf_length(`${pdfPath}/${filename}`)
-  //
-  //  await SchemeService.updateTool({
-  //    tool_code: toolcode,
-  //    tool_path: "/public/toolPDF/" + filename,
-  //    tool_name: filename,
-  //    document_length: doc_length
-  //  });
-  //  return res.send({ name: filename, result: "Создано", code: 200, toolcode });
-  //});
 
 });
 
 toolSceme.delete("/tool", async (req, res) => {
   try {
-    const { tool_code } = req.query;
-    console.log(tool_code);
-    await SchemeService.deleteAllInfo(tool_code);
+    const { tool_code, version } = req.query;
+    await SchemeService.deleteAllInfo(tool_code, Number(version))
   } catch (error) {
     console.log(error);
   }
@@ -62,19 +55,21 @@ toolSceme.delete("/tool", async (req, res) => {
 
 toolSceme.post("/tool/update", bodyParser.json(), (req, res) => {
   const { body } = req;
-  SchemeService.spmatNoListUpd(body.data).then((data) => res.json(data));
+  console.log(body)
+  try {
+    SchemeService.spmatNoListUpd(body.data).then((data) => res.json(data));
+
+  } catch (er) {
+    console.log((er))
+  }
 });
 
-toolSceme.post("/tool/:id/:num", bodyParser.json(), async (req, res) => {
+toolSceme.post("/tool/:id/:version/:num", bodyParser.json(), async (req, res) => {
   try {
 
-    const { id } = req.params;
-    const { num } = req.params;
-    const tool = await SchemeService.updateTool({ tool_code: id, picture_number: num });
-    await SchemeService.createPNGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code, Number(num));
-    await SchemeService.createJPGfromPDF(`${__dirname}/Scheme_service_server${tool.dataValues.tool_path}`, tool.dataValues.tool_code, Number(num));
-
-
+    const { id, version, num } = req.params;
+    console.log(id, version, num)
+    await SchemeService.updateTool({ tool_code: id, picture_number: num, version });
     return res.json({ status: 200 })
   } catch (error) {
     return error;
@@ -84,7 +79,7 @@ toolSceme.post("/tool/:id/:num", bodyParser.json(), async (req, res) => {
 toolSceme.get("/tools", (req, res) => {
   try {
     const options = req.query;
-    return SchemeService.getToolList(options).then((data) => res.json(data));
+    return SchemeService.get_tools({ ...options }).then((data) => res.json(data));
   } catch (error) {
     console.log(error);
     return error;
@@ -94,7 +89,6 @@ toolSceme.get("/tools", (req, res) => {
 toolSceme.get("/spareparts/:id", (req, res) => {
   try {
     const spmatNo = req.params.id;
-
     const options = req.query;
     SchemeService.getToolCodesBySPmatNo({ options, spmatNo }).then((data) =>
       res.json(data)
@@ -104,15 +98,17 @@ toolSceme.get("/spareparts/:id", (req, res) => {
   }
 });
 
-toolSceme.get("/tool/pdf/:id", async (req, res) => {
-  const toolcode = req.params.id;
-
-  const url = await S3_service.getFileUrl(`/${toolcode}`)
+toolSceme.get("/tool/pdf/:tool_code/:version", async (req, res) => {
+  const { tool_code, version } = req.params;
+  const current_tool_list = await SchemeService.get_tools({ tool_code, version })
+  if (!current_tool_list || current_tool_list.length > 1) {
+    return
+  }
+  const current_tool = current_tool_list[0]
+  console.log(current_tool)
+  console.log(`${current_tool}.pdf`, `/${current_tool.tool_code}/${current_tool.version}/`)
+  const url = await S3_service.getDownloadUrl(`${current_tool.tool_name}`, `/${current_tool.tool_code}/${current_tool.version}/`)
   return res.redirect(url);
-  //console.log(toolcode);
-  //SchemeService.getPDFSchemePath(toolcode).then((path) => {
-  //  return res.sendFile(`${__dirname}/Scheme_service_server${path}`);
-  //});
 });
 toolSceme.get("/tool/download/pdf/:id.pdf", async (req, res) => {
   const toolcode = req.params.id;
@@ -120,29 +116,37 @@ toolSceme.get("/tool/download/pdf/:id.pdf", async (req, res) => {
   const url = await S3_service.getFileUrl(`/${toolcode}`)
   return res.redirect(url);
 
-  // const toolcode = req.params.id;
-  // console.log(toolcode);
-  // SchemeService.getPDFSchemePath(toolcode).then((path) => {
-  //   return res.download(`${__dirname}/Scheme_service_server${path}`);
-  // });
 });
 
-toolSceme.get("/tool/png/:id/:num", (req, res) => {
-  const toolcode = req.params.id;
-  const { num } = req.params;
-  return res.sendFile(`${pngPath}${num}_${toolcode}.png`);
-});
-toolSceme.get("/tool/jpg/:id/:num", (req, res) => {
-  const toolcode = req.params.id;
-  const { num } = req.params;
+toolSceme.get("/tool/png/:tool_code/:version/:num", async (req, res) => {
+  const { tool_code, version, num } = req.params;
+  const current_tool_list = await SchemeService.get_tools({ tool_code, version })
+  if (!current_tool_list || current_tool_list.length > 1) {
+    return
+  }
+  const current_tool = current_tool_list[0]
+  const url = await S3_service.getDownloadUrl(`${current_tool.document_length - current_tool.picture_number + Number(num) - 1}.png`, `/${current_tool.tool_code}/${current_tool.version}/jpg/`)
 
-  return res.sendFile(`${jpgPath}${num}_${toolcode}.jpg`);
+  return res.redirect(url);
 });
-toolSceme.get("/tool/:id", (req, res) => {
-  const tool_code = req.params.id;
+toolSceme.get("/tool/jpg/:tool_code/:version/:num", async (req, res) => {
+  const { tool_code, version, num } = req.params;
+  const current_tool_list = await SchemeService.get_tools({ tool_code, version })
+  if (!current_tool_list || current_tool_list.length > 1) {
+    return
+  }
+  const current_tool = current_tool_list[0]
+  console.log(`tool/jpg download ${current_tool.document_length - current_tool.picture_number + Number(num)}.jpg`, `/${current_tool.tool_code}/${current_tool.version}/jpg/`)
+
+  const url = await S3_service.getDownloadUrl(`${current_tool.document_length - current_tool.picture_number + Number(num)}.jpg`, `/${current_tool.tool_code}/${current_tool.version}/jpg/`)
+  return res.redirect(url);
+});
+
+toolSceme.get("/tool/:tool_code/:version", (req, res) => {
+  const { tool_code, version } = req.params;
   const options = req.query;
-
-  SchemeService.getSPmatNoByToolCode({ tool_code, options }).then((data) => {
+  console.log(tool_code, version, options)
+  SchemeService.getSPmatNoByToolCode({ tool_code, version: Number(version), options }).then((data) => {
     res.json({ tool: tool_code, data });
   });
 });
