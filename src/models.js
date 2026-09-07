@@ -202,7 +202,7 @@ Tool_Files.init(
   }
 );
 
-sequelize.sync().then(() => { console.log('db created') })
+//sequelize.sync().then(() => { console.log('db created') })
 
 
 
