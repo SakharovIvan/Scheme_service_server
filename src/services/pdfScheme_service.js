@@ -137,8 +137,8 @@ class SchemeService {
   async spmatNoListUpd(data) {
     try {
       const checker = data.filter((el) => "id" in el);
-
       if (checker.length === 0) {
+        console.log('полное обновлени БД' + data[0].tool_code)
         const toolList = data.reduce((accumulator, currentValue) => {
           if (!accumulator.includes(currentValue.tool_code.toString())) {
             accumulator = [...accumulator, currentValue.tool_code.toString()];
@@ -176,11 +176,17 @@ class SchemeService {
         });
         await Promise.all(promises);
       } else {
+        console.warn("Обновление только существующих записей");
         const promises = data.map(async (el) => {
           const current = await New_ToolSPmatNo.findOne({ where: { id: el.id } });
           if (!current) {
             return;
           }
+          if (el.sppicode_num !== current.sppicode_num) {
+            await this.make_new_sppicode_num(current)
+            return
+          }
+
           return await current.update({ ...current, ...el });
         });
         await Promise.all(promises);
@@ -189,6 +195,23 @@ class SchemeService {
       console.log(error);
       return error;
     }
+  }
+
+  async make_new_sppicode_num(sp) {
+    const current = await New_ToolSPmatNo.findOne({ where: { id: sp.id } });
+    const current_tool_data = await New_ToolSPmatNo.findAll({ where: { tool_code: current.tool_code, version: current.version } })
+    let checker = 0
+    const promises = current_tool_data.map(async (tool_curr, index) => {
+
+      if (tool_curr.dataValues.id === current.id) {
+        checker++
+        await tool_curr.update({ sppicode_num: Number(sp.sppicode_num) });
+        return
+      }
+      await tool_curr.update({ sppicode_num: Number(index) + Number(checker) + 1 });
+    })
+    await Promise.all(promises).catch((err) => console.log(err))
+
   }
 
   async getSPmatNoByToolCode({ options, version, tool_code }) {
