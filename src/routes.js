@@ -98,23 +98,32 @@ toolSceme.get("/spareparts/:id", (req, res) => {
   }
 });
 
-toolSceme.get("/tool/pdf/:tool_code/:version", async (req, res) => {
+toolSceme.get("/tool/pdf/:tool_code/", async (req, res) => {
   const { tool_code, version } = req.params;
-  const current_tool_list = await SchemeService.get_tools({ tool_code, version })
+  const current_tool_list = await SchemeService.get_tools({ tool_code, current_version: true })
   if (!current_tool_list || current_tool_list.length > 1) {
     return
   }
   const current_tool = current_tool_list[0]
-  console.log(current_tool)
-  console.log(`${current_tool}.pdf`, `/${current_tool.tool_code}/${current_tool.version}/`)
   const url = await S3_service.getDownloadUrl(`${current_tool.tool_name}`, `/${current_tool.tool_code}/${current_tool.version}/`)
   return res.redirect(url);
 });
 toolSceme.get("/tool/download/pdf/:id.pdf", async (req, res) => {
-  const toolcode = req.params.id;
 
-  const url = await S3_service.getFileUrl(`/${toolcode}`)
-  return res.redirect(url);
+  try {
+    const toolcode = req.params.id;
+    const current_tool_list = await SchemeService.get_tools({ tool_code: toolcode, current_version: true })
+    if (!current_tool_list || current_tool_list.length > 1) {
+      return
+    }
+    const current_tool = current_tool_list[0]
+    const url = await S3_service.getDownloadUrl(`${current_tool.name}.pdf`, `/${current_tool.tool_code}/${current_tool.version}/`)
+    console.log(url)
+    return res.redirect(url);
+  } catch (er) {
+    console.log(er)
+  }
+
 
 });
 
